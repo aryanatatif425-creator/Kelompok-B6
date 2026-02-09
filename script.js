@@ -1,75 +1,412 @@
-// DOM Content Loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize card animations
-    initCardAnimations();
-    
-    // Add interactive effects
-    initHoverEffects();
-});
-
-// Animate cards on scroll/load
-function initCardAnimations() {
-    const cards = document.querySelectorAll('.member-card');
-    
-    // Use Intersection Observer for scroll animations
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                // Add delay based on card index
-                setTimeout(() => {
-                    entry.target.classList.add('visible');
-                }, index * 100);
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    });
-
-    cards.forEach(card => {
-        observer.observe(card);
-    });
+/* --- RESET & VARIABLES --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-// Add hover effects and interactivity
-function initHoverEffects() {
-    const cards = document.querySelectorAll('.member-card');
+:root {
+    /* --- COLOR PALETTE: CYBERPUNK THEME --- */
     
-    cards.forEach(card => {
-        // Mouse move parallax effect on cards
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = (y - centerY) / 20;
-            const rotateY = (centerX - x) / 20;
-            
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px) scale(1.02)`;
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
-        });
-    });
+    /* Ganti Orange jadi CYAN (Biru Muda Elektrik) */
+    --primary-cyan: #00E5FF;       /* Warna utama Cyan */
+    --neon-cyan: #2979FF;          /* Aksen biru lebih gelap */
+    
+    /* Ganti Blue jadi MAGENTA (Pink Ungu) */
+    --primary-magenta: #D500F9;    /* Warna utama Ungu/Magenta */
+    --neon-magenta: #FF4081;       /* Aksen Pink terang */
+    
+    /* Background colors */
+    --bg-dark: #090014;            /* Background sedikit ungu sangat gelap */
+    --bg-darker: #05000a;
+    
+    /* Text colors */
+    --text-main: #FFFFFF;
+    --text-muted: #B39DDB;         /* Text secondary agak keunguan */
+    
+    /* Glassmorphism settings */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.2);
 }
 
-// Emoji click effect (fun easter egg)
-document.querySelectorAll('.floating-emoji').forEach(emoji => {
-    emoji.addEventListener('click', () => {
-        emoji.style.transform = 'scale(2)';
-        emoji.style.opacity = '1';
-        setTimeout(() => {
-            emoji.style.transform = '';
-            emoji.style.opacity = '';
-        }, 300);
-    });
-});
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
 
-// Console easter egg
-console.log('%c🔥 Meet The Squad! 🔥', 'font-size: 24px; color: #ff6b35; font-weight: bold;');
-console.log('%cBuilt with 💜 by the team', 'font-size: 14px; color: #1e90ff;');
+/* --- BACKGROUND ANIMATION (AURORA EFFECT) --- */
+.bg-pattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: var(--bg-dark);
+    overflow: hidden;
+}
+
+.bg-pattern::before,
+.bg-pattern::after {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.2; /* Sedikit lebih terang untuk tema neon */
+    animation: drift 15s infinite alternate ease-in-out;
+}
+
+/* Bola cahaya 1 (Cyan) */
+.bg-pattern::before {
+    background: var(--primary-cyan);
+    top: -100px;
+    left: -100px;
+}
+
+/* Bola cahaya 2 (Magenta) */
+.bg-pattern::after {
+    background: var(--primary-magenta);
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+/* --- FLOATING EMOJIS --- */
+.floating-emoji {
+    position: fixed;
+    font-size: 2.5rem;
+    opacity: 0.15;
+    z-index: 0;
+    filter: hue-rotate(45deg); /* Mengubah warna emoji sedikit agar menyatu */
+    animation: floatEmoji 8s ease-in-out infinite;
+}
+
+@keyframes floatEmoji {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+}
+
+/* --- HEADER --- */
+header {
+    text-align: center;
+    padding: 100px 20px 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.badge {
+    display: inline-block;
+    background: rgba(0, 229, 255, 0.1); /* Background cyan tipis */
+    border: 1px solid var(--primary-cyan);
+    color: var(--primary-cyan);
+    padding: 8px 24px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+}
+
+h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.1;
+    letter-spacing: -2px;
+}
+
+/* Gradient Text Effect - Updated Colors */
+/* Class HTML lama 'highlight-orange' sekarang jadi CYAN */
+h1 .highlight-orange {
+    background: linear-gradient(to right, var(--primary-cyan), var(--neon-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(0, 229, 255, 0.3);
+}
+
+/* Class HTML lama 'highlight-blue' sekarang jadi MAGENTA */
+h1 .highlight-blue {
+    background: linear-gradient(to right, var(--neon-magenta), var(--primary-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(213, 0, 249, 0.3);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 550px;
+    margin: 0 auto;
+    font-weight: 400;
+}
+
+.subtitle .accent {
+    color: var(--text-main);
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-magenta);
+}
+
+/* --- GRID SYSTEM --- */
+.team-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px 120px;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 40px;
+    justify-items: center;
+}
+
+/* --- CARD DESIGN --- */
+.member-card {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    /* Gradient kartu agak keunguan gelap */
+    background: linear-gradient(145deg, rgba(20, 0, 40, 0.4) 0%, rgba(10, 0, 20, 0.2) 100%);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    padding: 50px 30px;
+    text-align: center;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0; 
+    transform: translateY(30px);
+}
+
+.member-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hover Effect */
+.member-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    border-color: var(--glass-highlight);
+    background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+/* Glow Shadow: ODD = Cyan, EVEN = Magenta */
+.member-card:nth-child(odd):hover {
+    box-shadow: 0 20px 50px rgba(0, 229, 255, 0.2), inset 0 0 0 1px rgba(0, 229, 255, 0.3);
+}
+
+.member-card:nth-child(even):hover {
+    box-shadow: 0 20px 50px rgba(213, 0, 249, 0.2), inset 0 0 0 1px rgba(213, 0, 249, 0.3);
+}
+
+/* Decoration Bar */
+.member-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 4px;
+    border-radius: 0 0 10px 10px;
+    background: var(--text-muted);
+    transition: width 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.member-card:nth-child(odd):hover::before {
+    width: 80%;
+    background: var(--primary-cyan);
+    box-shadow: 0 0 20px var(--primary-cyan);
+}
+
+.member-card:nth-child(even):hover::before {
+    width: 80%;
+    background: var(--primary-magenta);
+    box-shadow: 0 0 20px var(--primary-magenta);
+}
+
+/* --- PROFILE IMAGE --- */
+.profile-wrapper {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 30px;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    padding: 5px;
+    background: rgba(255,255,255,0.05);
+    transition: transform 0.5s ease;
+}
+
+.member-card:hover .profile-img {
+    transform: scale(1.05) rotate(3deg);
+    border-color: #fff;
+}
+
+/* Ring color adjustment */
+.profile-ring {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.1);
+    animation: rotateRing 20s linear infinite;
+}
+
+.member-card:nth-child(odd) .profile-ring { border-color: rgba(0, 229, 255, 0.3); }
+.member-card:nth-child(even) .profile-ring { border-color: rgba(213, 0, 249, 0.3); }
+
+@keyframes rotateRing {
+    to { transform: rotate(360deg); }
+}
+
+.status-dot {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 18px;
+    height: 18px;
+    background: #00E676; /* Green status is universal */
+    border: 3px solid var(--bg-dark);
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00E676;
+    z-index: 2;
+}
+
+/* --- TYPOGRAPHY DETAILS --- */
+.member-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 5px;
+    letter-spacing: -0.5px;
+}
+
+.member-nim {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.85rem;
+    color: var(--primary-cyan); /* NIM warna Cyan */
+    opacity: 0.8;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.member-card:nth-child(even) .member-nim {
+    color: var(--neon-magenta); /* NIM genap warna Magenta */
+}
+
+.member-role {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
+}
+
+/* Role Pills */
+.member-card:nth-child(odd) .member-role {
+    background: rgba(0, 229, 255, 0.1);
+    color: var(--primary-cyan);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+}
+
+.member-card:nth-child(even) .member-role {
+    background: rgba(213, 0, 249, 0.1);
+    color: var(--neon-magenta);
+    border: 1px solid rgba(213, 0, 249, 0.3);
+    box-shadow: 0 0 15px rgba(213, 0, 249, 0.1);
+}
+
+.member-intro {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 25px;
+    padding: 0 10px;
+}
+
+/* --- HOBBY BOX --- */
+.hobby-section {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.member-card:hover .hobby-section {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.hobby-icon {
+    font-size: 1.4rem;
+}
+
+.hobby-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-align: left;
+    line-height: 1.2;
+}
+
+.hobby-text span {
+    display: block;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+/* --- FOOTER --- */
+footer {
+    text-align: center;
+    padding: 50px 20px;
+    background: linear-gradient(to top, var(--bg-darker), transparent);
+    border-top: 1px solid var(--glass-border);
+}
+
+.footer-text {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.footer-text .orange { color: var(--primary-cyan); }   /* Override class orange jadi cyan */
+.footer-text .blue { color: var(--primary-magenta); }  /* Override class blue jadi magenta */
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    header { padding-top: 60px; }
+    h1 { font-size: 3rem; }
+    .team-grid { grid-template-columns: 1fr; }
+    .member-card { max-width: 100%; margin-bottom: 20px; }
+}
