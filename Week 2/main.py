@@ -25,13 +25,8 @@ def main():
             tambah_tugas(tasks, judul)
 
         elif pilihan == 2:
-<<<<<<< HEAD
             tampilkan_tugas(tasks)
             input("Tekan ENTER untuk kembali ke menu...")
-=======
-            # lihat tugas
-            tampilkan_tugas(tasks)
->>>>>>> fe3e6019e9495edab083cbd76a5c0d731847ce8d
 
         elif pilihan == 3:
             # tandai tugas selesai
@@ -42,7 +37,6 @@ def main():
                 tandai_selesai(tasks, index)
 
         elif pilihan == 4:
-<<<<<<< HEAD
     # hapus tugas
             tampilkan_tugas(tasks)
             nomor = input("Pilih nomor tugas: ")
@@ -50,14 +44,6 @@ def main():
         if index is not None:
             hapus_tugas(tasks, index)
             input("Tekan ENTER untuk kembali ke menu...")
-=======
-            # hapus tugas
-            tampilkan_tugas(tasks)
-            nomor = input("Pilih nomor tugas: ")
-            index = validasi_index(nomor, tasks)
-            if index is not None:
-                hapus_tugas(tasks, index)
->>>>>>> fe3e6019e9495edab083cbd76a5c0d731847ce8d
 
         elif pilihan == 5:
             # keluar program
