@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ui.py
 
 def tampilkan_menu():
@@ -12,6 +13,8 @@ def tampilkan_menu():
     print("=" * 30)
 
 
+=======
+>>>>>>> 259e69b0ad1bbbac2b1b28914d28a0fbfbb00e01
 def tampilkan_tugas(tasks):
     print("\n" + "=" * 30)
     print("         DAFTAR TUGAS")
