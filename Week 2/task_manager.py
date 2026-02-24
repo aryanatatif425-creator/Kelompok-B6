@@ -1,7 +1,4 @@
 #task_manager.py
-from asyncio import tasks
-from operator import index
-
 def tambah_tugas(tasks, judul):
     tugas_baru={"judul": judul, "status": "Belum Selesai"}
     tasks.append(tugas_baru)
